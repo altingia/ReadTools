@@ -34,10 +34,12 @@ import org.broadinstitute.barclay.argparser.ArgumentCollection;
 import org.broadinstitute.hellbender.cmdline.StandardArgumentDefinitions;
 import org.broadinstitute.hellbender.engine.GATKTool;
 import org.broadinstitute.hellbender.engine.ProgressMeter;
+import org.broadinstitute.hellbender.utils.io.IOUtils;
 import org.broadinstitute.hellbender.utils.read.GATKRead;
 import scala.Tuple2;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.function.Consumer;
 import java.util.stream.StreamSupport;
 
@@ -60,7 +62,7 @@ public abstract class ReadToolsWalker extends ReadToolsProgram {
     private double secondsBetweenProgressUpdates = ProgressMeter.DEFAULT_SECONDS_BETWEEN_UPDATES;
 
     @Argument(fullName = StandardArgumentDefinitions.REFERENCE_LONG_NAME, shortName = StandardArgumentDefinitions.REFERENCE_SHORT_NAME, doc = "Reference sequence file. Required for CRAM input.", optional = true, common = true)
-    private File referenceFile = null;
+    private String referencePath = null;
 
     @ArgumentCollection
     private RTInputArgumentCollection inputArgumentCollection = new RTInputArgumentCollection();
@@ -86,7 +88,7 @@ public abstract class ReadToolsWalker extends ReadToolsProgram {
     protected final void onStartup() {
         super.onStartup();
         progressMeter = new ProgressMeter(secondsBetweenProgressUpdates);
-        dataSource = inputArgumentCollection.getDataSource(referenceFile);
+        dataSource = inputArgumentCollection.getDataSource(getReferencePath());
         logger.info("Input source quality encoding: {}", dataSource.getOriginalQualityEncoding());
     }
 
@@ -216,8 +218,8 @@ public abstract class ReadToolsWalker extends ReadToolsProgram {
     public void closeTool() { }
 
     /** Gets the reference file if provided; {@code null} otherwise. */
-    public final File getReferenceFile() {
-        return referenceFile;
+    public final Path getReferencePath() {
+        return referencePath == null ? null : IOUtils.getPath(referencePath);
     }
 
     /** Rerturns {@code true} if the input is paired. */

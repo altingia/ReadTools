@@ -38,6 +38,7 @@ import org.broadinstitute.hellbender.utils.read.ReadConstants;
 
 import java.io.File;
 import java.io.Serializable;
+import java.nio.file.Path;
 
 /**
  * Argument collection for ReaTools input files.
@@ -75,7 +76,7 @@ public final class RTInputArgumentCollection implements Serializable {
     private Supplier<RTDataSource> source = null;
 
     // creates the reader
-    private ReadReaderFactory getReaderFactory(final File referenceFileName) {
+    private ReadReaderFactory getReaderFactory(final Path referenceFileName) {
         return new ReadReaderFactory()
                 .setReferenceSequence(referenceFileName)
                 .setValidationStringency(readValidationStringency);
@@ -86,7 +87,7 @@ public final class RTInputArgumentCollection implements Serializable {
      *
      * @param referenceFileName the reference file for CRAM inputs. May be {@code null}.
      */
-    public RTDataSource getDataSource(final File referenceFileName) {
+    public RTDataSource getDataSource(final Path referenceFileName) {
         RTDataSource.setReadReaderFactory(getReaderFactory(referenceFileName));
         if (source == null) {
             if (inputPair != null) {
